@@ -35,6 +35,7 @@ export class MockCalendarBackend implements CalendarBackend {
       location: input.location,
       description: input.description,
       all_day: false,
+      transparency: "opaque",
       recurring: !!input.recurrence,
     };
     this.events.set(event.id, event);

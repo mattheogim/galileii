@@ -6,6 +6,8 @@ export interface CalendarEvent {
   location?: string;
   description?: string;
   all_day: boolean;
+  /** "opaque" (blocks time) or "transparent" (visible but not busy). Default opaque. */
+  transparency?: "opaque" | "transparent";
   recurring?: boolean;
   html_link?: string;
 }

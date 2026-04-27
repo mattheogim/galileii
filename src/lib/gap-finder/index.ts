@@ -57,6 +57,9 @@ export function findGaps(input: GapFinderInput): Gap[] {
     const s = Date.parse(e.start);
     const en = Date.parse(e.end);
     if (!(en > s)) continue;
+    // Skip events the user marked as "free" / transparent — D-day countdowns,
+    // OOO indicators, etc. They're visible on the calendar but don't block time.
+    if (e.transparency === "transparent") continue;
     if (e.all_day) {
       busy.push({ start: s, end: en, source: e });
     } else {

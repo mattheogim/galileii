@@ -1,5 +1,5 @@
 import { google, type calendar_v3 } from "googleapis";
-import { OAuth2Client } from "google-auth-library";
+import type { OAuth2Client } from "google-auth-library";
 import type {
   CalendarBackend,
   CalendarEvent,
@@ -30,13 +30,14 @@ export class GoogleCalendarBackend implements CalendarBackend {
     refreshToken: string;
     calendarId?: string;
   }) {
-    this.oauth = new OAuth2Client({
+    this.oauth = new google.auth.OAuth2({
       clientId: opts.clientId,
       clientSecret: opts.clientSecret,
       redirectUri: opts.redirectUri,
-    });
+    }) as unknown as OAuth2Client;
     this.oauth.setCredentials({ refresh_token: opts.refreshToken });
-    this.cal = google.calendar({ version: "v3", auth: this.oauth });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.cal = google.calendar({ version: "v3", auth: this.oauth as any });
     this.defaultCalendarId = opts.calendarId ?? "primary";
   }
 
@@ -116,6 +117,7 @@ function toCalendarEvent(e: calendar_v3.Schema$Event): CalendarEvent {
     location: e.location ?? undefined,
     description: e.description ?? undefined,
     all_day: allDay,
+    transparency: e.transparency === "transparent" ? "transparent" : "opaque",
     recurring: !!e.recurringEventId || !!e.recurrence,
     html_link: e.htmlLink ?? undefined,
   };
@@ -135,11 +137,11 @@ export async function getAuthUrl(opts: {
   clientSecret: string;
   redirectUri: string;
 }): Promise<{ url: string; oauth: OAuth2Client }> {
-  const oauth = new OAuth2Client({
+  const oauth = new google.auth.OAuth2({
     clientId: opts.clientId,
     clientSecret: opts.clientSecret,
     redirectUri: opts.redirectUri,
-  });
+  }) as unknown as OAuth2Client;
   const url = oauth.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
