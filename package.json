@@ -1,0 +1,52 @@
+{
+  "name": "galileii",
+  "version": "0.1.0",
+  "description": "Personal scheduling assistant — MCP server. Anti-friction conversational, empty-time activator. BYOL.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "galileii": "./dist/bin/galileii.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/server.ts",
+    "cli": "tsx bin/galileii.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "scheduling",
+    "calendar",
+    "assistant",
+    "google-calendar",
+    "obsidian",
+    "anti-friction"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "googleapis": "^140.0.0",
+    "gray-matter": "^4.0.3",
+    "ulid": "^2.3.0",
+    "zod": "^3.22.0",
+    "zod-to-json-schema": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}
