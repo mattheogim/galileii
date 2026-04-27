@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   galileiiHome,
   profilePath,
@@ -10,6 +11,7 @@ import {
   configPath,
   envPath,
 } from "../lib/store/paths.js";
+import { loadCalendarBackend } from "../lib/calendar/loader.js";
 
 interface Check {
   name: string;
@@ -45,13 +47,54 @@ export async function runDoctor(): Promise<void> {
     checks.push({
       name: ".env permissions are 600",
       pass: mode === 0o600,
-      detail: mode === 0o600 ? undefined : `Got mode ${mode.toString(8)}; run \`chmod 600 ${env}\``,
+      detail:
+        mode === 0o600
+          ? undefined
+          : `Got mode ${mode.toString(8)}; run \`chmod 600 ${env}\``,
     });
   } else {
     checks.push({
-      name: ".env present",
+      name: ".env present (Google refresh token)",
       pass: false,
       detail: "Run `galileii auth` to create.",
+    });
+  }
+
+  const clientJson = resolve(home, "google-client.json");
+  const hasJson = existsSync(clientJson);
+  const hasEnvCreds = !!(
+    process.env.GALILEII_GOOGLE_CLIENT_ID && process.env.GALILEII_GOOGLE_CLIENT_SECRET
+  );
+  checks.push({
+    name: "Google OAuth client creds",
+    pass: hasJson || hasEnvCreds,
+    detail:
+      hasJson || hasEnvCreds
+        ? undefined
+        : `Save credentials JSON to ${clientJson} or set GALILEII_GOOGLE_CLIENT_ID/SECRET env vars.`,
+  });
+
+  // Live calendar test
+  try {
+    const { source, backend } = await loadCalendarBackend();
+    if (source === "google") {
+      // Try a tiny list call
+      const start = new Date().toISOString();
+      const end = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+      await backend.listEvents({ range: { start, end } });
+      checks.push({ name: "Google Calendar reachable", pass: true });
+    } else {
+      checks.push({
+        name: "Calendar backend",
+        pass: false,
+        detail: `Currently using ${source}. Run \`galileii auth\` to connect Google.`,
+      });
+    }
+  } catch (caught) {
+    checks.push({
+      name: "Google Calendar reachable",
+      pass: false,
+      detail: (caught as Error).message,
     });
   }
 
