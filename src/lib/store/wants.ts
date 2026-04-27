@@ -18,6 +18,14 @@ export interface Want {
   tags?: string[];
   created_at: string;
   last_proposed_at?: string;
+  /** User's own stated reason at want-creation. Anchors Tier 3 pre-commit. */
+  stated_reason?: string;
+  /** User's own minimum-viable version (5-min equivalent). Anchors Tier 3. */
+  minimum_viable?: string;
+  /** Whether Tier 4 (Screen Time block) is allowed for this want. */
+  hard_mode_eligible?: boolean;
+  /** Default duration for hard-mode block (minutes). */
+  hard_mode_min_duration?: number;
 }
 
 export async function readAllWants(): Promise<Want[]> {
@@ -58,8 +66,18 @@ function renderWantSection(w: Want): string {
   if (w.energy) lines.push(`- energy: ${w.energy}`);
   if (w.time_of_day) lines.push(`- time_of_day: ${w.time_of_day}`);
   if (w.tags?.length) lines.push(`- tags: [${w.tags.join(", ")}]`);
+  if (w.stated_reason) lines.push(`- stated_reason: ${quoteIfMultiline(w.stated_reason)}`);
+  if (w.minimum_viable) lines.push(`- minimum_viable: ${quoteIfMultiline(w.minimum_viable)}`);
+  if (w.hard_mode_eligible) lines.push(`- hard_mode_eligible: true`);
+  if (w.hard_mode_min_duration !== undefined)
+    lines.push(`- hard_mode_min_duration: ${w.hard_mode_min_duration}`);
   if (w.last_proposed_at) lines.push(`- last_proposed_at: ${w.last_proposed_at}`);
   return lines.join("\n") + "\n\n";
+}
+
+function quoteIfMultiline(s: string): string {
+  if (s.includes("\n") || s.length > 100) return JSON.stringify(s);
+  return s;
 }
 
 function ensureSection(content: string, horizon: Horizon): string {
@@ -107,6 +125,13 @@ export function parseWantsMarkdown(raw: string): Want[] {
         energy: fields.energy as Energy | undefined,
         time_of_day: fields.time_of_day as TimeOfDay | undefined,
         tags: fields.tags ? parseTagList(fields.tags) : undefined,
+        stated_reason: fields.stated_reason ? unquote(fields.stated_reason) : undefined,
+        minimum_viable: fields.minimum_viable ? unquote(fields.minimum_viable) : undefined,
+        hard_mode_eligible:
+          fields.hard_mode_eligible === "true" ? true : undefined,
+        hard_mode_min_duration: fields.hard_mode_min_duration
+          ? Number(fields.hard_mode_min_duration)
+          : undefined,
         created_at: fields.created_at ?? new Date().toISOString(),
         last_proposed_at: fields.last_proposed_at,
       });
@@ -130,4 +155,15 @@ function parseTagList(s: string): string[] {
     .split(",")
     .map((x) => x.trim())
     .filter(Boolean);
+}
+
+function unquote(s: string): string {
+  if (s.startsWith('"') && s.endsWith('"')) {
+    try {
+      return JSON.parse(s) as string;
+    } catch {
+      return s.slice(1, -1);
+    }
+  }
+  return s;
 }

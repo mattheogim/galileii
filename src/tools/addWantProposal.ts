@@ -22,6 +22,30 @@ const inputSchema = {
     .string()
     .optional()
     .describe("Verbatim user phrase that triggered this."),
+  stated_reason: z
+    .string()
+    .optional()
+    .describe(
+      "User's OWN reason for adding this want, in their own words. Captured at creation; anchors the Tier 3 pre-commit prompt later. Ask the user explicitly: 'Why do you want this?'",
+    ),
+  minimum_viable: z
+    .string()
+    .optional()
+    .describe(
+      "User's OWN minimum-viable version of this want — the 5-minute thing that still counts. e.g. 'put on running shoes and walk to the corner'. Ask the user: 'What's the smallest version that still counts?'",
+    ),
+  hard_mode_eligible: z
+    .boolean()
+    .optional()
+    .describe(
+      "Whether the user opts in to Tier 4 (Screen Time block) for this want. Ask: 'If you keep blowing this off, can I block YouTube/TikTok during it?' — never default to true.",
+    ),
+  hard_mode_min_duration: z
+    .number()
+    .int()
+    .min(5)
+    .optional()
+    .describe("If hard_mode_eligible, default duration of the Screen Time block in minutes."),
 } as const;
 
 export const addWantProposal: Tool<typeof inputSchema> = {
@@ -40,6 +64,10 @@ export const addWantProposal: Tool<typeof inputSchema> = {
       energy: args.energy,
       time_of_day: args.time_of_day,
       tags: args.tags,
+      stated_reason: args.stated_reason,
+      minimum_viable: args.minimum_viable,
+      hard_mode_eligible: args.hard_mode_eligible,
+      hard_mode_min_duration: args.hard_mode_min_duration,
       created_at: new Date().toISOString(),
     };
     const summary = `Add want: "${want.text}" (${want.horizon}${

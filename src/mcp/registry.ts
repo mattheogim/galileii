@@ -18,6 +18,10 @@ import { proposeReschedule, commitReschedule } from "../tools/rescheduleEvent.js
 import { logDecision } from "../tools/logDecision.js";
 import { dailyBriefing } from "../tools/dailyBriefing.js";
 import { eveningReview } from "../tools/eveningReview.js";
+import { proposeDiagnostic } from "../tools/proposeDiagnostic.js";
+import { proposeMinimumViable } from "../tools/proposeMinimumViable.js";
+import { offerHardMode } from "../tools/offerHardMode.js";
+import { commitHardMode } from "../tools/commitHardMode.js";
 
 const ALL_TOOLS: Tool<ZodShape>[] = [
   readProfile as unknown as Tool<ZodShape>,
@@ -38,6 +42,10 @@ const ALL_TOOLS: Tool<ZodShape>[] = [
   logDecision as unknown as Tool<ZodShape>,
   dailyBriefing as unknown as Tool<ZodShape>,
   eveningReview as unknown as Tool<ZodShape>,
+  proposeDiagnostic as unknown as Tool<ZodShape>,
+  proposeMinimumViable as unknown as Tool<ZodShape>,
+  offerHardMode as unknown as Tool<ZodShape>,
+  commitHardMode as unknown as Tool<ZodShape>,
 ];
 
 export function registerAll(server: McpServer): void {
