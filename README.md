@@ -11,28 +11,34 @@ It does two things calendar apps don't:
 
 ## Status
 
-V0 in active development. The MCP server boots, all 18 tools are wired, the gap-finder + proposer differentiator works end-to-end against a mock calendar backend. Google Calendar adapter (real backend) and OAuth wizard are next.
+V0, personal daily-driver stage. The MCP server boots, all 18 tools are wired, the gap-finder + proposer differentiator works end-to-end, and the Google Calendar adapter + OAuth wizard landed (April 2026). **Not yet published to npm** — run it from a clone (below). Polishing toward a public release; treat the API as unstable.
 
-## Quick start (when V0 ships)
+## Quick start (from a clone)
 
 ```bash
-# 1. Install + initialize
-npx galileii init        # scaffolds ~/.galileii/
-npx galileii auth        # connects Google Calendar via OAuth (coming soon)
-npx galileii doctor      # verifies setup
+# 1. Clone + build
+git clone https://github.com/mattheogim/galileii
+cd galileii
+npm install
+npm run build
 
-# 2. Add to your MCP client
+# 2. Initialize + connect Google Calendar
+npm run cli -- init      # scaffolds ~/.galileii/
+npm run cli -- auth      # Google Calendar OAuth wizard
+npm run cli -- doctor    # verifies setup
+
+# 3. Add to your MCP client
 #    Claude Desktop: ~/Library/Application Support/Claude/claude_desktop_config.json
 {
   "mcpServers": {
     "galileii": {
-      "command": "npx",
-      "args": ["-y", "galileii", "mcp"]
+      "command": "node",
+      "args": ["/absolute/path/to/galileii/dist/bin/galileii.js", "mcp"]
     }
   }
 }
 
-# 3. Restart your client. Open a chat:
+# 4. Restart your client. Open a chat:
 #    "Hey Galileii — what should I do with my afternoon?"
 ```
 
@@ -74,7 +80,7 @@ Open it in Obsidian, edit by hand, version-control with git — it's all standar
 ## Develop
 
 ```bash
-git clone https://github.com/<github-handle>/galileii
+git clone https://github.com/mattheogim/galileii
 cd galileii
 npm install
 npm test                  # runs vitest suite
@@ -98,7 +104,7 @@ GALILEII_HOME=/tmp/galileii-smoke GALILEII_BACKEND=mock-seeded npm run dev
 - **Tests:** vitest. The gap-finder and ProposalStore have full unit coverage.
 - **Distribution:** npm + `npx`. No SaaS infrastructure. Users bring their own LLM subscription.
 
-See [docs/architecture.md](./docs/architecture.md) for the full design (coming soon — see the build plan at `~/.claude/plans/galileii-lucky-lemon.md` for now).
+Full architecture docs coming soon.
 
 ## Roadmap
 
