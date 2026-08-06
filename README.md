@@ -11,7 +11,7 @@ It does two things calendar apps don't:
 
 ## Status
 
-V0, personal daily-driver stage. The MCP server boots, all 18 tools are wired, the gap-finder + proposer differentiator works end-to-end, and the Google Calendar adapter + OAuth wizard landed (April 2026). **Not yet published to npm** — run it from a clone (below). Polishing toward a public release; treat the API as unstable.
+V0 prototype (April 2026). The MCP server boots, all 22 tools are wired, the gap-finder + proposal store are unit-tested (12/12 passing), and the Google Calendar adapter + OAuth wizard work end-to-end. **Not yet published to npm** — run it from a clone (below). Not under active development: after self-testing I concluded the escalation features were the wrong product and sketched a lighter consent-only redesign; this repo is the working V0 snapshot.
 
 ## Quick start (from a clone)
 
@@ -46,7 +46,7 @@ npm run cli -- doctor    # verifies setup
 
 Galileii ships a recommended system prompt at `dist/prompts/system.md` (or `src/prompts/system.md` when developing). Paste it into your LLM client's "Custom Instructions" or save as a Claude Code skill at `~/.claude/skills/galileii/SKILL.md`. Without it, the LLM sees the tools but won't behave like an assistant.
 
-## The 18 V0 tools
+## The 22 V0 tools
 
 | Group | Tools |
 |---|---|
@@ -56,6 +56,7 @@ Galileii ships a recommended system prompt at `dist/prompts/system.md` (or `src/
 | **Empty-time activator** | `propose_activity_for_gap` |
 | **Calendar (write)** | `propose_event`, `commit_event`, `propose_cancel`, `commit_cancel`, `propose_reschedule`, `commit_reschedule` |
 | **Reflection** | `daily_briefing`, `evening_review` |
+| **Tier ladder** | `propose_diagnostic`, `propose_minimum_viable`, `offer_hard_mode`, `commit_hard_mode` |
 | **Audit** | `log_decision` |
 
 Every state-changing action is a **propose-then-confirm** dance. Commit tools accept only a `proposal_id`; they cannot mutate the calendar from the LLM's free-text input.
